@@ -1,0 +1,1 @@
+{'name': '', 'email': None, 'phone': None, 'skills': ['React', 'Next.js', 'Tailwind CSS', 'FastAPI', 'SQLAlchemy', 'LLM', 'Langchain', 'PostgreSQL'], 'education': {'degree': '', 'course': ''}, 'experience': {'role': '', 'year_of_experience': None, 'start_date': None, 'end_date': None}}
