@@ -67,7 +67,7 @@ def build_prompt(payload):
         - Compare JD and resume directly.
         - For skills: compare must/nice OR general.
         - For experience: compare required years vs candidate years. For the correct job title only and sum the similar to it
-        - For responsibilities: compare JD responsibilities with resume responsibilities.
+        - For responsibilities: compare JD responsibilities with resume responsibilities, experience and projects.
         - If a section was not evaluated, return null.
         - If the degree and course tell it as similar
         - Do NOT invent information.

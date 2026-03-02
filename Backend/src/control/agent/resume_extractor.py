@@ -70,19 +70,17 @@ def resume_extractor(text):
 
     try:
         parsed = json.loads(raw_output)
-
-        parsed.setdefault("name", "")
-        parsed.setdefault("skills", [])
-        parsed.setdefault("education", "")
-        parsed.setdefault("experience", [])
-        parsed.setdefault("key_resp", [])
-
-        parsed["email"] = email_match.group(0) if email_match else None
-        parsed["phone"] = phone_match.group(0) if phone_match else None
-        
         print(parsed)
 
-        return parsed  # ✅ THIS WAS MISSING
+        return {
+            "name": parsed.get("name", ""),
+            "email": email_match.group(0) if email_match else None,
+            "phone": phone_match.group(0) if phone_match else None,
+            "skills": parsed.get("skills", []),
+            "education": parsed.get("education", ""),
+            "experience": parsed.get("experience", []),
+            "key_resp": parsed.get("key_resp", [])
+            }# ✅ THIS WAS MISSING
 
     except Exception:
         return default_response

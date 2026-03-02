@@ -18,6 +18,7 @@ class CandidateExplanation(BaseModel):
 class CandidateScore(BaseModel):
     rank: int
     name: str
+    email: str
     final_score: float
     explanation: CandidateExplanation
 

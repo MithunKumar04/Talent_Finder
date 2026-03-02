@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from src.schemas.ranking import JDInput, RankingResponse
 from src.control.agent.ranking_service import rank_resumes
 

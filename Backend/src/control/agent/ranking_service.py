@@ -161,6 +161,7 @@ def rank_resumes(jd_text: str):
         if not scores or scores.get("rejected"):
             results.append({
                 "name": candidate_name,
+                "email": resume_output["email"],
                 "status": "Rejected",
                 "final_score": 0,
                 "explanation": explanation
@@ -168,6 +169,7 @@ def rank_resumes(jd_text: str):
         else:
             results.append({
                 "name": candidate_name,
+                "email": resume_output["email"],
                 "status": "Accepted",
                 "final_score": round(scores.get("final_score", 0), 3),
                 "explanation": explanation

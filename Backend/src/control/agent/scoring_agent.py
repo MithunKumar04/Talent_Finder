@@ -112,8 +112,12 @@ def compute_role_similarity_score(jd_values, resume_values, threshold=0.75):
 
     similarities = []
     relevant_indexes = []
+    
+    if not resume_values.get("role_embedding"):
+        return [], []
 
     for i, role_emb in enumerate(resume_values.get("role_embedding", [])):
+        
 
         sim = cosine_sim(jd_values.get("title_embedding"),role_emb)
 
@@ -262,21 +266,29 @@ def create_scores(jd_values, resume_values):
     role_fit_score = None
     recency_factor = None
 
-    if jd_values.get("year", 0) > 0 and resume_values.get("role_embedding"):
+    if jd_values.get("year", 0) > 0:
 
-        similarities, relevant_indexes = compute_role_similarity_score(jd_values,resume_values)
-        if relevant_indexes:
+        if not resume_values.get("role"):
+            return {
+                "rejected": True,
+                "reason": "No experience provided but experience required"
+            }
 
-            experience_result = compute_experience_score(jd_values,resume_values,similarities,relevant_indexes)
+        similarities, relevant_indexes = compute_role_similarity_score(jd_values, resume_values)
 
-            if experience_result:
+        if not relevant_indexes:
+            return {
+                "rejected": True,
+                "reason": "No relevant experience found"
+            }
 
-                experience_ratio = experience_result["ratio"]
-                role_fit_score = experience_result["role_fit"]
+        experience_result = compute_experience_score(jd_values, resume_values, similarities, relevant_indexes)
 
-                recency_factor = compute_recency_decay_score(resume_values, relevant_indexes)
-        else:
-            return None
+        if experience_result:
+            experience_ratio = experience_result["ratio"]
+            role_fit_score = experience_result["role_fit"]
+            recency_factor = compute_recency_decay_score(resume_values, relevant_indexes)
+
     
 
     # ---------------- DYNAMIC SCORING ----------------
