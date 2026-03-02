@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List, Optional, Dict, Any
+from typing import List, Optional
 
 
 class JDInput(BaseModel):
@@ -7,12 +7,12 @@ class JDInput(BaseModel):
 
 
 class CandidateExplanation(BaseModel):
-    summary: Optional[str]
-    skills_explanation: Optional[str]
-    experience_explanation: Optional[str]
-    education_explanation: Optional[str]
-    final_justification: Optional[str]
-    final_score: float
+    summary: Optional[str] = None
+    skills_explanation: Optional[str] = None
+    experience_explanation: Optional[str] = None
+    education_explanation: Optional[str] = None
+    responsibility_explanation: Optional[str] = None
+    final_justification: Optional[str] = None
 
 
 class CandidateScore(BaseModel):
