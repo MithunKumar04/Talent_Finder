@@ -7,7 +7,7 @@ import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { useAppDispatch } from '../store';
 import { loginSuccess } from '../store/authSlice';
-import { mockLogin,DEFAULT_CREDENTIALS } from '../lib/mockApi';
+import { mockLogin, DEFAULT_CREDENTIALS } from '../lib/mockApi';
 import { toast } from 'sonner';
 
 const Login = () => {
@@ -15,6 +15,7 @@ const Login = () => {
   const [password, setPassword] = useState(DEFAULT_CREDENTIALS.password);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
@@ -34,49 +35,69 @@ const Login = () => {
   };
 
   return (
-    <div className="flex min-h-screen">
-      {/* Left panel */}
-      <div className="hidden lg:flex lg:w-1/2 bg-primary items-center justify-center p-12">
+    <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-background">
+
+      {/* LEFT PANEL (Brand / Marketing) */}
+      <div className="hidden lg:flex items-center justify-center relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-indigo-600 via-indigo-700 to-purple-700" />
+        <div className="absolute inset-0 bg-black/20" />
+
         <motion.div
-          initial={{ opacity: 0, x: -30 }}
+          initial={{ opacity: 0, x: -40 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6 }}
-          className="max-w-md text-primary-foreground"
+          transition={{ duration: 0.7 }}
+          className="relative z-10 max-w-md p-12 text-white"
         >
-          <div className="flex items-center gap-3 mb-8">
-            <div className="w-12 h-12 rounded-xl bg-accent flex items-center justify-center">
-              <Briefcase className="w-6 h-6 text-accent-foreground" />
+          <div className="flex items-center gap-3 mb-10">
+            <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur">
+              <Briefcase className="w-6 h-6 text-white" />
             </div>
-            <h1 className="text-2xl font-bold">TalentFinder</h1>
+            <h1 className="text-2xl font-bold tracking-tight">
+              TalentFinder
+            </h1>
           </div>
+
           <h2 className="text-4xl font-bold leading-tight mb-4">
-            Manage your jobs<br />with confidence.
+            Hire smarter.<br />
+            Faster. Better.
           </h2>
-          <p className="text-primary-foreground/70 text-lg">
-            Track, create, and manage job postings all in one powerful dashboard.
+
+          <p className="text-white/80 text-lg leading-relaxed">
+            Manage job postings, rank candidates, and track hiring progress
+            with confidence — all in one dashboard.
           </p>
         </motion.div>
       </div>
 
-      {/* Right panel — login form */}
-      <div className="flex-1 flex items-center justify-center p-8">
+      {/* RIGHT PANEL (Login Form) */}
+      <div className="flex items-center justify-center px-6 py-12">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
           className="w-full max-w-sm"
         >
-          <div className="lg:hidden flex items-center gap-3 mb-8">
-            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
-              <Briefcase className="w-5 h-5 text-primary-foreground" />
+
+          {/* Mobile Logo */}
+          <div className="lg:hidden flex items-center gap-3 mb-10">
+            <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center">
+              <Briefcase className="w-5 h-5 text-white" />
             </div>
-            <h1 className="text-xl font-bold text-foreground">JobFlow</h1>
+            <h1 className="text-xl font-bold tracking-tight">
+              TalentFinder
+            </h1>
           </div>
 
-          <h2 className="text-2xl font-bold text-foreground mb-1">Sign in</h2>
-          <p className="text-muted-foreground mb-8">Enter your credentials to access the dashboard</p>
+          <h2 className="text-2xl font-bold mb-1">
+            Sign in
+          </h2>
+          <p className="text-muted-foreground mb-8">
+            Enter your credentials to access the dashboard
+          </p>
 
-          <form onSubmit={handleLogin} className="space-y-5">
+          <form onSubmit={handleLogin} className="space-y-6">
+
+            {/* Email */}
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <div className="relative">
@@ -93,6 +114,7 @@ const Login = () => {
               </div>
             </div>
 
+            {/* Password */}
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <div className="relative">
@@ -109,23 +131,38 @@ const Login = () => {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition"
                 >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  {showPassword
+                    ? <EyeOff className="w-4 h-4" />
+                    : <Eye className="w-4 h-4" />}
                 </button>
               </div>
             </div>
 
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Signing in...' : 'Sign in'}
+            {/* Submit */}
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white shadow-md"
+            >
+              {loading ? 'Signing in…' : 'Sign in'}
             </Button>
           </form>
 
-          <div className="mt-6 p-4 rounded-lg bg-secondary text-sm">
-            <p className="font-medium text-foreground mb-1">Default credentials:</p>
-            <p className="text-muted-foreground">Email: {DEFAULT_CREDENTIALS.email}</p>
-            <p className="text-muted-foreground">Password: {DEFAULT_CREDENTIALS.password}</p>
+          {/* Default Credentials Box */}
+          <div className="mt-8 rounded-xl border border-border bg-muted/40 p-4 text-sm">
+            <p className="font-medium mb-1">
+              Default credentials
+            </p>
+            <p className="text-muted-foreground">
+              Email: <span className="font-mono">{DEFAULT_CREDENTIALS.email}</span>
+            </p>
+            <p className="text-muted-foreground">
+              Password: <span className="font-mono">{DEFAULT_CREDENTIALS.password}</span>
+            </p>
           </div>
+
         </motion.div>
       </div>
     </div>

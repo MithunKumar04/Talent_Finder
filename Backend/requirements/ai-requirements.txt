@@ -15,5 +15,3 @@ langchain-ollama
 sentence_transformers
 
 fastapi
-
-tf-keras

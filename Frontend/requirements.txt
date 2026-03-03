@@ -1,0 +1,1 @@
+react-router-dom tailwindcss @tailwindcss/vite  axios  tailwind-merge clsx lucide-react framer-motion sonner @reduxjs/toolkit react-redux store @radix-ui/react-accordion @tanstack/react-query  @radix-ui/react-toast   class-variance-authority  @radix-ui/react-label @vitejs/plugin-react  tailwindcss postcss autoprefixer next-themes @radix-ui/react-tooltip

@@ -8,6 +8,8 @@ export const store = configureStore({
     auth: authReducer,
     jobs: jobsReducer,
   },
+  devTools: process.env.NODE_ENV !== 'production', // Enables Redux DevTools
+
 });
 
 export type RootState = ReturnType<typeof store.getState>;
