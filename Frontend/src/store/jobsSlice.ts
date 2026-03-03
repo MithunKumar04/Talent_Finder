@@ -9,6 +9,7 @@ export interface Candidate {
   experience?: string;
   skills?: string[];
   [key: string]: unknown;
+  remarks?: string[];
 }
 
 export interface JobPosting {
@@ -56,8 +57,50 @@ const jobsSlice = createSlice({
     clearError(state) {
       state.error = null;
     },
+    addCandidateRemark(state,action: PayloadAction<{jobId: string; candidateName: string;remark: string;}>) {
+      const { jobId, candidateName, remark } = action.payload;
+
+      const job = state.jobs.find((j) => j.id === jobId);
+      if (!job) return;
+
+      const candidate = job.candidates.find(
+        (c) => c.name === candidateName
+      );
+      if (!candidate) return;
+
+      if (!candidate.remarks) {
+        candidate.remarks = [];
+      }
+
+      candidate.remarks.push(remark);
+
+      localStorage.setItem('jobPostings', JSON.stringify(state.jobs));
+    },
+
+    removeCandidateRemark(
+      state,
+      action: PayloadAction<{
+        jobId: string;
+        candidateName: string;
+        index: number;
+      }>
+    ) {
+      const { jobId, candidateName, index } = action.payload;
+
+      const job = state.jobs.find((j) => j.id === jobId);
+      if (!job) return;
+
+      const candidate = job.candidates.find(
+        (c) => c.name === candidateName
+      );
+      if (!candidate || !candidate.remarks) return;
+
+      candidate.remarks.splice(index, 1);
+
+      localStorage.setItem('jobPostings', JSON.stringify(state.jobs));
+    },
   },
 });
 
-export const { setLoading, addJobPosting, setSelectedJob, setError, clearError } = jobsSlice.actions;
+export const { setLoading, addJobPosting, setSelectedJob, setError, clearError,addCandidateRemark, removeCandidateRemark } = jobsSlice.actions;
 export default jobsSlice.reducer;

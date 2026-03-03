@@ -11,9 +11,13 @@ import {
   X
 } from 'lucide-react';
 import { Badge } from '../components/ui/badge';
-import { useAppSelector } from '../store';
+import { useAppSelector, useAppDispatch } from '../store';
 import { cn } from '../lib/utils';
 import type { Candidate } from '../store/jobsSlice';
+import {
+  addCandidateRemark,
+  removeCandidateRemark
+} from '../store/jobsSlice';
 import { useNavigate } from 'react-router-dom';
 
 interface KanbanCandidate extends Candidate {
@@ -23,19 +27,34 @@ interface KanbanCandidate extends Candidate {
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const { jobs } = useAppSelector((s) => s.jobs);
 
-  const [selectedCandidate, setSelectedCandidate] =
-    useState<KanbanCandidate | null>(null);
-
   const [remark, setRemark] = useState('');
-  const [candidateRemarks, setCandidateRemarks] =
-    useState<Record<string, string[]>>({});
-
   const [selectedJobId, setSelectedJobId] = useState<string>('all');
   const [jobSearch, setJobSearch] = useState('');
   const [expandedColumns, setExpandedColumns] =
     useState<Record<string, boolean>>({});
+
+  // ✅ Only store keys, not full object
+  const [selectedCandidateKey, setSelectedCandidateKey] =
+    useState<{ jobId: string; candidateName: string } | null>(null);
+
+  // 🔥 Always get fresh candidate from Redux
+  const selectedCandidate = useMemo(() => {
+    if (!selectedCandidateKey) return null;
+
+    const job = jobs.find(
+      (j) => j.id === selectedCandidateKey.jobId
+    );
+    if (!job) return null;
+
+    return (
+      job.candidates.find(
+        (c) => c.name === selectedCandidateKey.candidateName
+      ) || null
+    );
+  }, [selectedCandidateKey, jobs]);
 
   const filteredJobs = useMemo(() => {
     let result = jobs;
@@ -62,11 +81,11 @@ const Dashboard = () => {
       }));
 
     const rejected = allJobCandidates.filter(
-      (c) => c.final_score < 0.6
+      (c) => (c.final_score ?? 0) < 0.6
     );
 
     const screenedData = allJobCandidates.filter(
-      (c) => c.rank !== 0 && c.final_score >= 0.6
+      (c) => c.rank !== 0 && (c.final_score ?? 0) >= 0.6
     );
 
     const shortlisted = [...screenedData]
@@ -80,7 +99,7 @@ const Dashboard = () => {
     return {
       jobId: job.id,
       jobTitle: job.title,
-      sourcedCount: allJobCandidates.length, // ✅ TOTAL SOURCED
+      sourcedCount: allJobCandidates.length,
       columns: [
         {
           key: 'rejected',
@@ -121,30 +140,21 @@ const Dashboard = () => {
   };
 
   const addRemark = () => {
-    if (!remark.trim() || !selectedCandidate) return;
-    const key = `${selectedCandidate.jobId}-${selectedCandidate.name}`;
-    setCandidateRemarks((prev) => ({
-      ...prev,
-      [key]: [...(prev[key] || []), remark.trim()],
-    }));
+    if (!remark.trim() || !selectedCandidateKey) return;
+
+    dispatch(
+      addCandidateRemark({
+        jobId: selectedCandidateKey.jobId,
+        candidateName: selectedCandidateKey.candidateName,
+        remark: remark.trim(),
+      })
+    );
+
     setRemark('');
-  };
-
-  const removeRemark = (key: string, index: number) => {
-    setCandidateRemarks((prev) => ({
-      ...prev,
-      [key]: prev[key].filter((_, i) => i !== index),
-    }));
-  };
-
-  const hasRemarks = (c: KanbanCandidate) => {
-    const key = `${c.jobId}-${c.name}`;
-    return (candidateRemarks[key] || []).length > 0;
   };
 
   return (
     <div className="overflow-x-hidden">
-
       {/* Header */}
       <div className="mb-6 flex flex-col sm:flex-row justify-between gap-4">
         <div>
@@ -192,7 +202,6 @@ const Dashboard = () => {
           <div key={board.jobId}>
             <h2 className="text-xl font-semibold">{board.jobTitle}</h2>
 
-            {/* ✅ TOTAL SOURCED */}
             <div className="mt-1 mb-4 text-sm text-blue-600 font-medium">
               👥 {board.sourcedCount} total sourced candidates
             </div>
@@ -225,7 +234,12 @@ const Dashboard = () => {
                             'glass-card rounded-xl p-4 border-l-4 cursor-pointer hover:shadow-md transition',
                             col.borderColor
                           )}
-                          onClick={() => setSelectedCandidate(c)}
+                          onClick={() =>
+                            setSelectedCandidateKey({
+                              jobId: c.jobId,
+                              candidateName: c.name,
+                            })
+                          }
                         >
                           <div className="flex justify-between items-center">
                             <div>
@@ -236,48 +250,37 @@ const Dashboard = () => {
                                 {c.jobTitle}
                               </p>
                             </div>
-                            
+
                             <div className="flex items-center gap-2">
-                              {hasRemarks(c) && (
+                              {(c.remarks?.length ?? 0) > 0 && (
                                 <PenLine
                                   size={14}
                                   className="text-indigo-500"
-                                  title="Remarks added"
                                 />
                               )}
                               <Badge className={col.color}>
-                                {c.rank === 0 ? 'Rejected' : `Rank ${c.rank}`}
+                                {c.rank === 0
+                                  ? 'Rejected'
+                                  : `Rank ${c.rank}`}
                               </Badge>
                             </div>
                           </div>
                         </motion.div>
-                        
                       ))}
-
-                      {col.candidates.length > 5 && (
-                        <button
-                          onClick={() => toggleColumn(columnKey)}
-                          className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1"
-                        >
-                          {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-                          {isExpanded ? 'Show less' : 'Show more'}
-                        </button>
-                      )}
                     </div>
                   </div>
                 );
               })}
             </div>
-            
           </div>
         ))}
       </div>
 
-      {/* Remark Modal */}
-      {selectedCandidate && (
+      {/* Modal */}
+      {selectedCandidate && selectedCandidateKey && (
         <div
           className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-          onClick={() => setSelectedCandidate(null)}
+          onClick={() => setSelectedCandidateKey(null)}
         >
           <div
             className="bg-white rounded-2xl p-6 w-full max-w-lg"
@@ -304,16 +307,14 @@ const Dashboard = () => {
               </button>
 
               <button
-                onClick={() => setSelectedCandidate(null)}
+                onClick={() => setSelectedCandidateKey(null)}
                 className="px-4 py-2 border rounded"
               >
                 Cancel
               </button>
             </div>
 
-            {(candidateRemarks[
-              `${selectedCandidate.jobId}-${selectedCandidate.name}`
-            ] || []).map((r, i) => (
+            {(selectedCandidate.remarks || []).map((r, i) => (
               <div
                 key={i}
                 className="flex items-center justify-between bg-indigo-50 px-3 py-2 rounded mb-2"
@@ -323,9 +324,13 @@ const Dashboard = () => {
                   size={14}
                   className="cursor-pointer text-red-500"
                   onClick={() =>
-                    removeRemark(
-                      `${selectedCandidate.jobId}-${selectedCandidate.name}`,
-                      i
+                    dispatch(
+                      removeCandidateRemark({
+                        jobId: selectedCandidateKey.jobId,
+                        candidateName:
+                          selectedCandidateKey.candidateName,
+                        index: i,
+                      })
                     )
                   }
                 />

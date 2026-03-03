@@ -1,2 +1,14 @@
-
 fastapi
+uvicorn
+python-jose[cryptography]
+passlib[bcrypt]
+pydantic
+python-dotenv
+
+'pydantic[email]'
+
+argon2_cffi
+pydantic-settings
+psycopg2
+
+pip install python-multipart
